@@ -199,7 +199,7 @@ After the interview:
 - **Determine mod name:** `[GameName]Access` - abbreviate if 3+ words (e.g., "PetIdleAccess", "DsaAccess" for "Das Schwarze Auge")
 - Create `project_status.md` with collected information (game name, paths, architecture, experience level)
 - Create `docs/game-api.md` as placeholder for game discoveries
-- Enter the concrete paths in CLAUDE.md under "Environment"
+- Enter the concrete paths in CODEX.md under "Environment"
 
 ---
 

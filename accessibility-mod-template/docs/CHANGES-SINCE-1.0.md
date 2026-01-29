@@ -1,7 +1,7 @@
 # Breaking / structural changes since version 1.0
 
 This document summarizes **non-trivial structural changes** introduced after the original
-Claude-oriented template (v1.0.x).
+Codex-oriented template (v1.0.x).
 
 ---
 
