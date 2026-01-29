@@ -1,0 +1,59 @@
+# Codex project configuration
+# Loaded only when the project is marked "trusted" in your Codex client.
+#
+# This repository is designed for Codex CLI primarily.
+#
+# Profiles are experimental and may change or be removed in future releases.
+# They are not currently supported in the Codex IDE extension.
+#
+# Select a profile when starting Codex:
+#   codex --profile default
+#   codex --profile research
+#   codex --profile deps
+#
+# You can also override any setting for a single run:
+#   codex --config sandbox_workspace_write.network_access=true
+#   codex --config model='"gpt-5.2-codex"'
+#
+# For a fuller workflow guide, see: docs/codex-workflow.md
+
+# Default profile loaded unless overridden by `codex --profile <name>`.
+profile = "default"
+
+# Keep top-level values minimal; profiles carry the real settings.
+sandbox_mode = "workspace-write"
+
+[profiles.default]
+# Offline-first, conservative approvals (recommended for day-to-day work).
+approval_policy = "on-request"
+model = "gpt-5.2-codex"
+
+[profiles.default.features]
+web_search_request = false
+
+[profiles.default.sandbox_workspace_write]
+network_access = false
+
+[profiles.research]
+# Allows the Web Search tool, but still blocks outbound network access for shell commands.
+approval_policy = "on-request"
+model = "gpt-5.2-codex"
+
+[profiles.research.features]
+web_search_request = true
+
+[profiles.research.sandbox_workspace_write]
+network_access = false
+
+[profiles.deps]
+# For dependency restores / installs (allows outbound network for shell commands).
+# Keep approvals on-request to avoid surprise network activity.
+approval_policy = "on-request"
+model = "gpt-5.2-codex"
+
+[profiles.deps.features]
+# Leave on; you can turn it off per-run if desired.
+web_search_request = true
+
+[profiles.deps.sandbox_workspace_write]
+network_access = true

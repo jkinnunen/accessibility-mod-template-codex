@@ -1,0 +1,55 @@
+# Contributing to Accessibility Mod Template (Codex)
+
+## About this project
+
+This repository is a foundation for starting accessibility modding projects with OpenAI Codex.
+
+It was created from the perspective of a blind screen reader user. The goal is to help new modders get started with:
+- A strong technical baseline
+- Repeatable accessibility patterns
+- Protection against common pitfalls
+- Clear guidance that Codex can follow
+
+## How you can help
+
+### 1. Share what worked (and what didn't)
+
+If you've used this template or built an accessibility mod:
+- What did you find useful?
+- What was missing or confusing?
+- What additional templates or documentation would help?
+- What prompts or instruction patterns helped Codex produce better code?
+
+### 2. Technical feedback (especially from experienced programmers)
+
+Honest feedback is welcome:
+- Where does it show this was created without traditional coding knowledge?
+- Which coding patterns should be improved?
+- Which architectural decisions need reconsidering?
+- Which common mistakes should the template help avoid?
+- Are the provided code templates following best practices?
+
+### 3. Additional templates
+
+Examples:
+- Handler patterns you've found useful
+- Utility classes that solve common problems
+
+## How to contribute
+
+Open an issue or make a pull request.
+
+
+Documentation hygiene
+--------------------
+
+This repository enforces markdown formatting with markdownlint.
+
+Before committing documentation changes or opening a pull request, run:
+
+    npm ci
+    npm run lint:md
+
+CI runs the same check via:
+
+    .github/workflows/markdownlint.yml

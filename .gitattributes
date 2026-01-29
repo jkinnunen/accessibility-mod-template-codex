@@ -1,0 +1,14 @@
+# Ensure consistent text normalization across platforms
+* text=auto eol=lf
+
+# Keep Windows scripts with CRLF if added later
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Markdown and docs
+*.md text eol=lf
+*.txt text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
