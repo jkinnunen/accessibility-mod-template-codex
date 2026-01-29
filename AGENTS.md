@@ -173,3 +173,14 @@ Codex MUST always state:
 - the exact command it intends to run
 - why it is needed
 - what files, branches, or remotes it will affect
+
+
+## Accessibility goal compliance (MANDATORY)
+
+Codex MUST explicitly respect and adhere to the stated Accessibility goal defined in
+`docs/pre-analysis-message.md`.
+
+- Codex MUST NOT propose solutions that contradict the stated Accessibility goal.
+- Codex MUST treat the Accessibility goal as a hard constraint, not a suggestion.
+- If a requested action or proposed solution would violate the Accessibility goal,
+  Codex MUST stop and ask for clarification before proceeding.
