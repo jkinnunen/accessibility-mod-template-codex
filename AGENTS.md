@@ -121,7 +121,6 @@ Rules:
   - whether the repository is public or private
 - If required info is missing, stop and ask. Do not guess.
 
-
 ## Git operations (mandatory approvals)
 
 Codex MUST distinguish between read-only Git commands and mutating/network-affecting Git commands.
@@ -174,7 +173,6 @@ Codex MUST always state:
 - why it is needed
 - what files, branches, or remotes it will affect
 
-
 ## Accessibility goal compliance (MANDATORY)
 
 Codex MUST explicitly respect and adhere to the stated Accessibility goal defined in
@@ -184,3 +182,22 @@ Codex MUST explicitly respect and adhere to the stated Accessibility goal define
 - Codex MUST treat the Accessibility goal as a hard constraint, not a suggestion.
 - If a requested action or proposed solution would violate the Accessibility goal,
   Codex MUST stop and ask for clarification before proceeding.
+
+## Workspace input ingestion (Codex CLI) (MANDATORY)
+
+When required analysis inputs (logs, assemblies, UI dumps) are NOT present in
+`accessibility-mod-template/workspace-input/`, Codex MUST:
+
+1) Follow the trusted-project prerequisite documented in:
+   `docs/setup-guide.md` → section
+   **"Codex CLI: enabling safe local file access (trusted project)"**
+
+2) Request ONLY the minimum set of files required for the task.
+
+3) Prefer approved auto-copy:
+   - Ask for explicit approval to create missing subfolders under `workspace-input/`
+     and copy the required files into them.
+   - If approval is denied, provide exact manual copy instructions (what, from where, to where).
+
+This document defines mandatory behavior for Codex.
+All concrete user-facing setup steps live in `docs/setup-guide.md`.

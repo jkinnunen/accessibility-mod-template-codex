@@ -188,7 +188,6 @@ This repository enforces markdown formatting rules via markdownlint.
 - Run locally: `npm run lint:md`
 - CI: `.github/workflows/markdownlint.yml`
 
-
 ## GitHub CLI (gh) safety and setup
 
 This section is for use **after** Codex is running and you want to publish the repository to GitHub.
@@ -236,8 +235,6 @@ If you want Codex to create the GitHub repository using `gh repo create`, Codex 
 
 Then, with approval, Codex may run `gh repo create ...` and set the remote accordingly.
 
-
-
 ## Git safety model
 
 This project enforces an approval-gated Git workflow.
@@ -253,3 +250,30 @@ Before running mutating Git commands, Codex must confirm:
 - whether the operation is reversible
 
 This mirrors the GitHub CLI (`gh`) safety rules and is intentional.
+
+## Workspace-input ingestion (Codex CLI)
+
+When required external artifacts are missing from `accessibility-mod-template/workspace-input/`:
+
+- Preferred: ask for approval to run copy commands that:
+  - create missing target folders under `workspace-input/`
+  - copy ONLY the minimum required files into the appropriate subfolders
+- If approval is denied: provide exact manual copy steps.
+
+Before requesting access to any folder outside the repository (including the game install),
+instruct the user to create:
+
+`C:\Users\<Username>\.codex\config.toml`
+
+with:
+
+```
+[projects."\\\\?\\<repo-folder>"]
+trust_level = "trusted"
+
+[features]
+experimental_windows_sandbox = true
+elevated_windows_sandbox = true
+```
+
+Then restart Codex CLI.

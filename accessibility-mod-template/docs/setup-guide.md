@@ -1,3 +1,11 @@
+## Audience and role
+
+This document defines the authoritative operational setup and constraints for **Codex CLI**.
+
+- It is written primarily for Codex CLI to read and follow.
+- Human readers should treat it as a specification of Codex behavior, not as a general user guide.
+- If this document conflicts with informal instructions elsewhere, this document takes precedence.
+
 # Setup Guide for New Accessibility Mod Projects
 
 This guide is only needed for the initial project setup.
@@ -157,26 +165,32 @@ Question: Do you have a decompiler tool (dnSpy or ILSpy) installed?
 If no, explain options:
 
 **ILSpy (recommended):**
-- Download: https://github.com/icsharpcode/ILSpy/releases
-- **Advantage:** Can be controlled via command line, allowing Codex to automate decompilation
-- Command-line usage: `ilspycmd -p -o decompiled "[Game]_Data\Managed\Assembly-CSharp.dll"`
-- This makes the entire decompilation process automatable - Codex can do it for you
+- Download (GUI): https://github.com/icsharpcode/ILSpy/releases
+- GUI-ILSpy does NOT include a command-line decompiler
+- Command-line tool: **ilspycmd** (installed separately as a .NET global tool)
+- **Advantage:** Command-line decompilation enables automated workflows when ilspycmd is installed
+- Install ilspycmd:
+  - Requires .NET SDK
+  - Install with: `dotnet tool install --global ilspycmd`
+- Command-line usage example:
+  - `ilspycmd -p -o decompiled "[Game]_Data\Managed\Assembly-CSharp.dll"`
+- If ilspycmd is not installed, use the GUI and export decompiled sources manually
 
-**dnSpy (alternative):**
-- Download: https://github.com/dnSpy/dnSpy/releases
+**dnSpyEx (alternative):**
+- Download: https://github.com/dnSpyEx/dnSpy/releases
 - GUI-based tool with manual workflow
 - Use it to decompile `Assembly-CSharp.dll` from `[Game]_Data\Managed\`
 - The decompiled code should be copied to `decompiled/` in this project directory
 
-**Screen reader instructions for dnSpy:**
-1. Open DnSpy.exe
+**Screen reader instructions for dnSpyEx:**
+1. Open dnSpy.exe
 2. Use Ctrl+O to select the DLL (e.g., Assembly-CSharp.dll)
 3. In the "File" menu, select "Export to Project"
 4. Press Tab once - lands on an unlabeled button for target directory selection
 5. There, select the target directory (best to create a "decompiled" subdirectory in this project directory beforehand, so Codex can easily find the source code)
 6. After confirming the directory selection, press Tab repeatedly until you reach the "Export" button
 7. The export takes about half a minute
-8. Then close dnSpy
+8. Then close dnSpyEx
 
 For beginners: Games are written in a programming language and then "compiled" (translated into machine code). Decompiling reverses this - we get readable code. We need this to understand how the game works and where to hook in our accessibility features.
 
@@ -646,12 +660,58 @@ Parameter `-Architecture` can be `x64` or `x86`.
 - MelonLoader GitHub: https://github.com/LavaGang/MelonLoader
 - MelonLoader Installer: https://github.com/LavaGang/MelonLoader.Installer/releases
 - Tolk (Screen reader): https://github.com/ndarilek/tolk/releases
-- dnSpy (Decompiler): https://github.com/dnSpy/dnSpy/releases
+- dnSpyEx (Decompiler): https://github.com/dnSpyEx/dnSpy/releases
 - .NET SDK: https://dotnet.microsoft.com/download
 
 ---
 
 ## Notes for Codex users
+
+### Codex CLI: enabling safe local file access (trusted project)
+
+> **Authoritative instructions**
+> This section is the single source of truth for configuring trusted local access.
+> It is intended to be read and followed by both the human user and Codex CLI.
+
+If Codex CLI needs access to your game installation folder or any folder outside the repository,
+you must trust the repository folder so Codex can load `.codex/config.toml` and operate within
+its sandbox rules.
+
+Create this file (if it does not exist):
+
+`C:\Users\<Username>\.codex\config.toml`
+
+with this content (replace placeholders):
+
+```
+[projects."\\\\?\\<repo-folder>"]
+trust_level = "trusted"
+
+[features]
+experimental_windows_sandbox = true
+elevated_windows_sandbox = true
+```
+
+Where:
+- `<Username>` is your Windows username
+- `<repo-folder>` is the folder where you ran `codex`, e.g. `D:\src\TLDAccess`
+
+After creating the file, restart Codex CLI.
+
+### Preferred workflow: Codex CLI copies required artifacts into workspace-input (with approval)
+
+This template uses `accessibility-mod-template/workspace-input/` as the canonical location for
+external game artifacts (logs, assemblies, UI dumps).
+
+When something is missing, the preferred workflow is:
+
+1. Codex lists the minimum required files and their expected source locations.
+2. Codex asks for approval to run copy commands (PowerShell `New-Item` and `Copy-Item`).
+3. If you approve, Codex creates missing target folders under `workspace-input/` and copies files
+   into the correct subfolders.
+4. If you do NOT approve, Codex provides exact manual copy instructions instead.
+
+This keeps analysis reproducible while minimizing what is copied.
 
 - Codex (cloud tasks) runs inside an isolated environment. If you need it to inspect a local game installation, you typically have to copy relevant files (for example logs, decompiled dumps, screenshots, or exported UI hierarchies) into the repository workspace first.
 - Codex CLI runs on your machine and can inspect your local filesystem inside the allowed sandbox. Use `.codex/config.toml` and your approval prompts to control what it may access and execute.

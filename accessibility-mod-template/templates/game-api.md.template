@@ -1,68 +1,322 @@
-# Game API reference (template)
+# Game API Documentation (Accessibility Modding)
 
-This document describes the parts of the game's API that are relevant for accessibility modding.
+## Overview
 
-Fill this file as you discover information about the game through analysis, logs, or experimentation.
-Do not speculate: mark unknown areas clearly.
+- **Game:** [GAME NAME]
+- **Game version:** [EXACT game version]
+- **Engine:** Unity [VERSION]
+- **Runtime:** [net35 / net6 / IL2CPP – from loader logs]
+- **Architecture:** [32-bit / 64-bit]
+- **Developer:** [DEVELOPER NAME – exactly as in loader log]
+
+### Tooling and build context
+
+- **Loader (if applicable):** [MelonLoader / BepInEx / Other]
+- **Loader version:** [VERSION]
+- **Il2Cpp:** [Yes / No / Unknown]
+- **Obfuscation:** [Yes / No / Unknown]
+- **Decompilers used:** [ILSpy / dnSpyEx / Other]
+- **Important assemblies:** [Assembly-CSharp.dll, UnityEngine.CoreModule.dll, ...]
+
+**Documentation principles:**
+- This document is based on **direct observation, decompilation, logs, and runtime inspection**.
+- **Do not speculate.** Unknown or partially understood behavior must be marked explicitly.
+- If method bodies are unavailable (e.g. IL2CPP), document **signatures and observed behavior only**.
+- If a class, field, or method purpose is unclear, document the signature and observed behavior only.
+- Treat this document as an evolving reference, not a finished description.
 
 ---
 
-## Game information
+## 1. Singleton access points
 
-- Game name:
-- Game version:
-- Engine:
-- Scripting / runtime environment:
+Static or globally reachable entry points into game systems.
+
+### Examples
+
+- `[ClassName].instance`
+- `[ManagerName].Instance`
+- `[ServiceLocator].Get<T>()`
+
+For each entry point, document:
+
+- Class name:
+- How it is accessed:
+- Lifetime (startup, scene-based, persistent):
+- Accessibility relevance:
 
 ---
 
-## Relevant systems
+## 2. Core game systems
 
-Describe systems that affect accessibility.
+Document the major gameplay systems that indirectly impact accessibility through UI state and flow.
 
 Examples:
-- UI framework (Unity UI, custom UI, etc.)
-- Input handling
-- Focus or navigation logic
-- Localization systems
+- Game state controller (pause/gameplay/game over)
+- Player controller / avatar state
+- Inventory / crafting
+- Missions / objectives
+- Audio / subtitles (if relevant)
+
+For each system, document:
+- Responsible classes / singletons:
+- Important fields / properties:
+- Important methods:
+- How the system affects UI and player interaction:
 
 ---
 
-## UI elements and interactions
+## 3. UI system
 
-List UI elements that are relevant for screen reader users.
+Describe the UI framework and controller layer.
 
-For each element, document:
-- Name / identifier
-- Where it appears (menu, HUD, dialog, etc.)
-- How it is triggered or focused
-- Any accessibility-relevant state (enabled/disabled, selected, etc.)
+Examples:
+- Unity UI (uGUI) + EventSystem
+- TextMeshPro
+- Custom navigation/focus manager
+- Custom widgets and UI controllers
+
+Document:
+- Base screen classes (e.g. `[UIScreenBase]`)
+- How screens are shown/hidden (e.g. `Show()`, `Hide()`)
+- Whether UI objects are created/destroyed or enabled/disabled
+- Where UI state is stored (static managers vs scene objects)
 
 ---
 
-## Events and callbacks
+## 4. UI elements and interactions
 
-Document events, callbacks, or hooks that can be observed or intercepted.
+Document UI elements relevant to screen reader users.
 
-- UI events
-- Input events
+### UI element documentation template
+
+For **each important UI element**, document:
+
+- **Identifier / name:** GameObject name, component, or stable ID
+- **Context:** menu / HUD / dialog / scene
+- **Focus behavior:** how focus is obtained (Unity EventSystem vs custom)
+- **Trigger / interaction:** click, submit, hotkey, controller
+- **State:** enabled/disabled, selected, visible/hidden
+- **Label source:** direct text / localization key / icon-only
+- **Observed screen reader issue (if any):** what fails and when
+- **Visibility / interactivity conditions:** when it becomes visible or interactive
+- **Hierarchy path (if stable):** record the hierarchy path if it helps runtime lookup
+
+### UI focus notes
+
+- Note whether UI focus is:
+  - Implicitly handled by Unity’s EventSystem
+  - Explicitly managed by code (custom focus manager)
+- Identify UI elements that:
+  - Are created dynamically at runtime
+  - Do not have stable object names
+  - Rely on icons or visual-only indicators
+  - Do not expose text content directly
+
+### Notes
+
+- Document **what exists**, not what should exist.
+- Dynamically generated UI elements may change identifiers between sessions.
+- If UI is generated dynamically, describe creation patterns.
+
+---
+
+## 5. Screens and menus
+
+High-level UI screens and menus.
+
+For each screen/menu:
+- Name (e.g. MainMenu, PauseMenu, GameOver)
+- How it is entered
+- Contained UI elements
+- Known accessibility issues
+- Whether it is reachable only under specific game states or scenes
+
+---
+
+## 6. HUD elements
+
+In-game HUD components that convey gameplay state.
+
+Examples:
+- Health bar
+- Ammo counter
+- Minimap
+- Status effects
+- Contextual prompts
+
+For each element:
+- Update frequency
+- Visibility rules
+- Whether information is time-critical
+- Whether it relies on icons/visual-only indicators
+
+---
+
+## 7. Input system
+
+Document how input is read and routed, especially for menu navigation and activation.
+
+Examples:
+- Unity Input Manager
+- New Input System
+- Custom input abstraction layer
+
+Document:
+- Key classes (e.g. `[InputManager].instance`)
+- Common methods (e.g. `GetKey(key)`, `GetKeyDown(key)`, `GetAxis(axisName)`)
+- Whether keyboard/controller bindings are remappable
+- Where focus navigation/submit/cancel are handled
+
+---
+
+## 8. Scene management
+
+Document how scenes and UI layers are loaded and how that affects discoverability.
+
+Document:
+- Scene manager class (e.g. `UnityEngine.SceneManagement.SceneManager`)
+- Common methods (e.g. `LoadScene(sceneName)`, `LoadSceneAsync(sceneName)`, `GetActiveScene()`)
+- Scene lifecycle events (if available)
+- When UI objects appear: at startup, on scene load, or only at runtime
+
+---
+
+## 9. Save system
+
+Document saving and loading flows, because they often drive UI dialogs and state changes.
+
+Document:
+- Save manager class (e.g. `[SaveManager]`)
+- Common methods (e.g. `SaveGame()`, `LoadGame()`, `DeleteSave()`)
+- Save location (if relevant for debugging): `%APPDATA%/[GameName]/` or game-specific location
+- UI dialogs involved (confirmations, error dialogs)
+
+---
+
+## 10. Events and callbacks
+
+Observed or hookable events.
+
+Examples:
+- UI selection changes
+- Button activation
 - Game state changes
+- Observer/EventBus patterns
 
-If method bodies are not available (e.g. IL2CPP), describe observed behavior instead.
+Document:
+- Event source
+- Trigger conditions
+- Parameters
+- Accessibility relevance
+
+If method bodies are unavailable (IL2CPP), describe **observed runtime behavior**.
 
 ---
 
-## Known limitations
+## 11. Localization / Text resources
 
-Document any limitations discovered during analysis.
+Document how UI text is produced and resolved.
+
+- Localization system type: string tables / keys / custom
+- Common classes: LocalizationManager, StringTable, etc.
+- How text is resolved:
+  - key → localized string
+  - runtime formatting / placeholders
+- Where interception is possible:
+  - before rendering (resolved string)
+  - after rendering (TextMeshPro / Unity UI Text)
+
+Notes:
+- Are UI elements storing keys instead of final text?
+- Are some labels icon-only or dynamically generated?
+
+---
+
+## 12. Networking (if applicable)
+
+If the game has multiplayer/networked UI, document the framework and relevant managers.
+
+- Framework: [Mirror / Netcode / Custom]
+- Network manager classes: `[NetworkManager]`, `[NetworkPlayer]`
+- UI differences between offline vs online states
+- Accessibility impacts (timing, state sync, authority)
+
+---
+
+## 13. Modding notes (MelonLoader)
+
+If using MelonLoader, document stable hooks and where to attach logging and runtime inspection.
+
+### Common hooks
+
+- `OnApplicationStart()`
+- `OnUpdate()`
+- `OnSceneWasLoaded(sceneName)`
+
+For each hook, document:
+- What is safe to do there
+- What data is available there
+- Which accessibility checks or instrumentation should run there
+
+---
+
+## 14. Reverse engineering notes
+
+Use this section to record practical realities and constraints discovered during analysis.
+
+- If possible, record:
+  - The hierarchy path of important UI elements
+  - Conditions under which elements become visible or interactive
+- IL2CPP builds may:
+  - Remove method bodies
+  - Strip unused metadata
+  - Obscure generic type information
+- Some systems may only be observable at runtime (not in static decompilation)
+
+Checklist:
+- [ ] Missing singleton references
+- [ ] Unknown method purposes
+- [ ] Unmapped enums
+- [ ] Undocumented UI focus behavior
+
+---
+
+## 15. Known limitations
+
+Document technical or structural limitations discovered during analysis.
 
 Examples:
 - Missing metadata in IL2CPP assemblies
-- UI elements created dynamically at runtime
+- Dynamically generated UI without stable identifiers
 - Accessibility-relevant information not exposed in code
+
+All limitations should be documented as they are discovered.
 
 ---
 
-## Notes
+## 16. Notes
 
-Free-form notes, open questions, and references to logs or experiments.
+Free-form notes, open questions, and references.
+
+- Evidence:
+  `[log file + timestamp] / [experiment steps] / [decompiled signature]`
+
+---
+
+## 17. TODO / Open questions
+
+Clearly list unresolved issues.
+
+For each item:
+- What is unknown
+- Why it matters for accessibility
+- What evidence is missing
+
+---
+
+## Summary (optional)
+
+Short summary of:
+- Major accessibility blockers
+- Most promising hook points
+- Areas requiring runtime experimentation
