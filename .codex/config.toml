@@ -10,6 +10,7 @@
 #   codex --profile default
 #   codex --profile research
 #   codex --profile deps
+#   codex --profile yolo
 #
 # You can also override any setting for a single run:
 #   codex --config sandbox_workspace_write.network_access=true
@@ -27,9 +28,7 @@ sandbox_mode = "workspace-write"
 # Offline-first, conservative approvals (recommended for day-to-day work).
 approval_policy = "on-request"
 model = "gpt-5.2-codex"
-
-[profiles.default.features]
-web_search_request = false
+web_search = "disabled"
 
 [profiles.default.sandbox_workspace_write]
 network_access = false
@@ -38,9 +37,7 @@ network_access = false
 # Allows the Web Search tool, but still blocks outbound network access for shell commands.
 approval_policy = "on-request"
 model = "gpt-5.2-codex"
-
-[profiles.research.features]
-web_search_request = true
+web_search = "cached"
 
 [profiles.research.sandbox_workspace_write]
 network_access = false
@@ -50,10 +47,16 @@ network_access = false
 # Keep approvals on-request to avoid surprise network activity.
 approval_policy = "on-request"
 model = "gpt-5.2-codex"
-
-[profiles.deps.features]
-# Leave on; you can turn it off per-run if desired.
-web_search_request = true
+web_search = "live"
 
 [profiles.deps.sandbox_workspace_write]
 network_access = true
+
+[profiles.yolo]
+# YOLO / full-access profile (DANGEROUS).
+# Use only for temporary, supervised runs where you intentionally want zero approvals.
+# This profile can modify arbitrary files and run commands with full access.
+
+approval_policy = "never"  # No approval prompts.
+sandbox_mode = "danger-full-access"  # Full filesystem/process access. Avoid for normal work.
+web_search = "live"  # Enables Web Search and allows live lookups.

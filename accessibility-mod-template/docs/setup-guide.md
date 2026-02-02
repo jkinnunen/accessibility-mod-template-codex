@@ -173,7 +173,7 @@ If no, explain options:
   - Requires .NET SDK
   - Install with: `dotnet tool install --global ilspycmd`
 - Command-line usage example:
-  - `ilspycmd -p -o decompiled "[Game]_Data\Managed\Assembly-CSharp.dll"`
+  - `ilspycmd -p -o "decompiled\Assembly-CSharp" "[Game]_Data\Managed\Assembly-CSharp.dll"`
 - If ilspycmd is not installed, use the GUI and export decompiled sources manually
 
 **dnSpyEx (alternative):**
@@ -684,6 +684,8 @@ Create this file (if it does not exist):
 with this content (replace placeholders):
 
 ```
+suppress_unstable_features_warning = true
+
 [projects."\\\\?\\<repo-folder>"]
 trust_level = "trusted"
 

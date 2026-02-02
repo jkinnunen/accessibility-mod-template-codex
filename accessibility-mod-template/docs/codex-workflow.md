@@ -11,26 +11,38 @@ This template is intended to be used with Codex CLI, because mod development typ
 
 ## Profiles included in this repository
 
-Profiles are defined in `.codex/config.toml` and selected with `codex --profile <name>`.
+Profiles are defined in `.codex/config.toml`. Codex CLI loads project-scoped config files
+only when you trust the project (see `docs/setup-guide.md`).
+
+Select a profile with:
+
+- `codex --profile <name>` (alias: `-p <name>`)
+- For non-interactive runs: `codex exec --profile <name> "..."`
+
+All profiles in this repository use the model: `gpt-5.2-codex`.
 
 - `default`
-  - approval_policy: on-request
-  - web_search_request: false
-  - sandbox_workspace_write.network_access: false
+  - `approval_policy`: `on-request`
+  - `web_search`: `"disabled"`
+  - `sandbox_workspace_write.network_access`: `false`
 
 - `research`
-  - approval_policy: on-request
-  - web_search_request: true
-  - sandbox_workspace_write.network_access: false
+  - `approval_policy`: `on-request`
+  - `web_search`: `"cached"`
+  - `sandbox_workspace_write.network_access`: `false`
 
 - `deps`
-  - approval_policy: on-request
-  - web_search_request: true
-  - sandbox_workspace_write.network_access: true
+  - `approval_policy`: `on-request`
+  - `web_search`: `"live"`
+  - `sandbox_workspace_write.network_access`: `true`
 
 Notes:
-- `web_search_request` enables the Web Search tool. It does not automatically enable outbound network access for shell commands.
-- `sandbox_workspace_write.network_access` controls outbound network access for commands executed inside the workspace-write sandbox.
+- `web_search` is the preferred setting. Legacy keys like `features.web_search_request` / `web_search_request`
+  are deprecated and exist only for backwards compatibility.
+- `codex --search` is a convenience flag that sets `web_search="live"` for that run.
+- `sandbox_workspace_write.network_access` controls outbound network access for commands executed in the
+  `workspace-write` sandbox.
+
 
 ## Choosing a model
 
@@ -47,13 +59,32 @@ Keep in mind:
 
 ## One-off overrides (CLI)
 
-If you need to temporarily override a setting without changing config files, use `--config` (value is TOML, not JSON):
+Use one-off overrides when you need a temporary change without editing any config files.
 
-- `codex --config model='"gpt-5.2-codex"'`
-- `codex --config sandbox_workspace_write.network_access=true`
-- `codex --config features.web_search_request=true`
+Prefer dedicated flags when they exist:
 
-Tip: When in doubt, quote the value so your shell does not split it.
+- `--model, -m <model>`
+- `--sandbox, -s read-only|workspace-write|danger-full-access`
+- `--ask-for-approval, -a untrusted|on-failure|on-request|never`
+- `--search` (enables live web search for this run)
+
+Use `--config, -c key=value` for arbitrary keys (repeatable). Values are parsed as TOML; when in doubt, quote them.
+
+Examples:
+
+- Dedicated flag:
+  - `codex --model gpt-5.2-codex`
+- Generic override:
+  - `codex --config model='"gpt-5.2-codex"'`
+- Enable cached web search:
+  - `codex --config web_search='"cached"'`
+- Enable live web search:
+  - `codex --config web_search='"live"'`
+- Enable outbound network access inside the workspace-write sandbox:
+  - `codex --config sandbox_workspace_write.network_access=true`
+
+Tip: if a value contains spaces or quotes, wrap the whole `key=value` in single quotes so your shell does not split it.
+
 
 ## Suggested workflow for mod development
 
@@ -116,11 +147,21 @@ If the change was inspired by a secondary source, include it, but also include t
 
 ## Pre-analysis step (mandatory)
 
-Before **every** analysis session, send the pre-analysis message to Codex:
+Codex MUST load the pre-analysis message automatically at the start of every analysis session.
+
+Source file (within this repository):
 
 - `accessibility-mod-template/docs/pre-analysis-message.md`
 
-This message establishes the analysis boundaries and prevents invalid assumptions.
+Procedure:
+
+1) Codex reads the file content directly from the repository.
+2) Codex verifies that all required fields are filled (no placeholder markers like `<...>` or `[TODO]`).
+3) If anything required is missing or ambiguous, Codex asks the user targeted questions to complete it.
+4) Codex MUST refuse to proceed with analysis until the pre-analysis message is complete.
+
+The user should not be asked to paste this file into the chat. Codex reads it itself.
+
 
 ## IL2CPP projects
 
@@ -263,17 +304,9 @@ When required external artifacts are missing from `accessibility-mod-template/wo
 Before requesting access to any folder outside the repository (including the game install),
 instruct the user to create:
 
-`C:\Users\<Username>\.codex\config.toml`
+`C:\\Users\\<Username>\\.codex\\config.toml`
 
-with:
-
-```
-[projects."\\\\?\\<repo-folder>"]
-trust_level = "trusted"
-
-[features]
-experimental_windows_sandbox = true
-elevated_windows_sandbox = true
-```
+Follow the authoritative instructions in:
+`docs/setup-guide.md` → **"Codex CLI: enabling safe local file access (trusted project)"**
 
 Then restart Codex CLI.
