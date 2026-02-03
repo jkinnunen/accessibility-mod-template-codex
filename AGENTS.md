@@ -54,6 +54,7 @@ Code patterns and architecture: `accessibility-mod-template/docs/ACCESSIBILITY_M
 Always do the following before writing new code:
 
 1. Search `decompiled/` for the real class and method names; never guess
+- When decompiling DLLs (e.g. via ilspycmd), Codex MUST create one output folder per DLL under `workspace-input/decompiled/<AssemblyName>/` and MUST NOT decompile into `workspace-input/decompiled/` root.
 2. Check `docs/game-api.md` for documented keys, methods, and patterns
 3. Use only the "Safe Keys for Mod" section (see `docs/game-api.md` -> "Game Key Bindings")
 
@@ -88,6 +89,8 @@ Example of a correct request:
 Please copy it to `accessibility-mod-template/workspace-input/ui/` and confirm when done.”
 
 ## Pre-analysis message requirement (hard gate)
+
+- Codex MUST NOT ask the user to paste `pre-analysis-message.md` into chat. Codex must read the file from the repository.
 
 Codex MUST refuse to begin any analysis unless the user has sent the pre-analysis message template:
 

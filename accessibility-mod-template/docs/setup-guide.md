@@ -168,12 +168,15 @@ If no, explain options:
 - Download (GUI): https://github.com/icsharpcode/ILSpy/releases
 - GUI-ILSpy does NOT include a command-line decompiler
 - Command-line tool: **ilspycmd** (installed separately as a .NET global tool)
+
+Important: Codex MUST decompile each DLL into its own subfolder under `workspace-input/decompiled/` and MUST NOT write decompiled outputs directly into `workspace-input/decompiled/`.
+Example: `Assembly-CSharp.dll` → `workspace-input/decompiled/Assembly-CSharp/`.
 - **Advantage:** Command-line decompilation enables automated workflows when ilspycmd is installed
 - Install ilspycmd:
   - Requires .NET SDK
   - Install with: `dotnet tool install --global ilspycmd`
 - Command-line usage example:
-  - `ilspycmd -p -o "decompiled\Assembly-CSharp" "[Game]_Data\Managed\Assembly-CSharp.dll"`
+  - `ilspycmd -p -o "workspace-input\decompiled\Assembly-CSharp" "[Game]_Data\Managed\Assembly-CSharp.dll"`
 - If ilspycmd is not installed, use the GUI and export decompiled sources manually
 
 **dnSpyEx (alternative):**

@@ -1,3 +1,6 @@
+Important: Codex MUST decompile each DLL into its own subfolder under `workspace-input/decompiled/` and MUST NOT write decompiled outputs directly into `workspace-input/decompiled/`.
+Example: `Assembly-CSharp.dll` → `workspace-input/decompiled/Assembly-CSharp/`.
+
 # Codex workflow (post-install)
 
 Audience: Codex CLI / Codex Cloud usage **after installation**.
@@ -147,21 +150,25 @@ If the change was inspired by a secondary source, include it, but also include t
 
 ## Pre-analysis step (mandatory)
 
-Codex MUST load the pre-analysis message automatically at the start of every analysis session.
+Codex MUST treat `docs/pre-analysis-message.md` as the canonical pre-analysis input.
 
-Source file (within this repository):
+### What Codex must do (automatic)
 
-- `accessibility-mod-template/docs/pre-analysis-message.md`
+1) Read `accessibility-mod-template/docs/pre-analysis-message.md` from the repository filesystem.
+2) Validate that all required fields are filled (placeholders like `[LIKE THIS]` are NOT valid).
+3) If anything is missing, ask ONLY for the missing items and instruct the user to update the file.
+4) Re-read the file and confirm it is complete before starting any analysis.
 
-Procedure:
+### Important behavior constraints
 
-1) Codex reads the file content directly from the repository.
-2) Codex verifies that all required fields are filled (no placeholder markers like `<...>` or `[TODO]`).
-3) If anything required is missing or ambiguous, Codex asks the user targeted questions to complete it.
-4) Codex MUST refuse to proceed with analysis until the pre-analysis message is complete.
+- Codex MUST NOT ask the user to paste the file contents into chat.
+- If Codex cannot read the file for any reason (e.g. wrong working directory, missing file),
+  Codex must:
+  - explain exactly what path it attempted to read, and
+  - instruct the user to create/fix the file at that path, then
+  - re-read it.
 
-The user should not be asked to paste this file into the chat. Codex reads it itself.
-
+Proceeding with analysis is forbidden until this step is complete.
 
 ## IL2CPP projects
 
